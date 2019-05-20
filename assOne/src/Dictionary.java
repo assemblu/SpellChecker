@@ -1,6 +1,9 @@
 import java.io.*;
 import java.lang.reflect.Array;
+import java.nio.Buffer;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.io.BufferedReader;
@@ -16,9 +19,9 @@ public class Dictionary
     private File corpusFile;
     private HashMap<String, Integer> dictionaryHash;
 
-    public Dictionary()
+    public Dictionary(File dictionaryFile)
     {
-        dictionaryFile = new File("dictionary.txt");
+        this.dictionaryFile = dictionaryFile;
         dictionaryHash = new HashMap<String, Integer>(1300000);
     }
 
@@ -47,49 +50,6 @@ public class Dictionary
         this.corpusFile = new File(corpusFile);
     }
 
-    public boolean doesDictionaryExist()
-    {
-        try
-        {
-            if(dictionaryFile.createNewFile())
-            {
-                return true;
-            }
-        }
-        catch(IOException e)
-        {
-            System.err.println("Dictionary exists.");
-        }
-        return false;
-    }
-
-    public boolean isDictionaryEmpty()
-    {
-        if(dictionaryFile.length() == 0)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isCorpusEmpty(String corpusFile)
-    {
-        try(BufferedReader br = Files.newBufferedReader(Paths.get(corpusFile)))
-        {
-            if(br.readLine() == null)
-            {
-                //File empty
-                return true;
-            }
-        }
-        catch(IOException e)
-        {
-            System.err.println("Corpus file is empty!");
-            return false;
-        }
-        return false;
-    }
-
 
 
     //could use .matches("[a-zA-Z]*") instead but this is faster
@@ -105,70 +65,6 @@ public class Dictionary
             }
         }
         return true;
-    }
-
-    public void readCorpus()
-    {
-        int count = 0;
-        try
-        {
-            var patter = Pattern.compile("[A-Za-z]+");
-
-            BufferedReader read = new BufferedReader(new FileReader(corpusFile));
-            String line;
-            while((line = read.readLine()) != null)
-            {
-                var matcher = patter.matcher(line);
-                while(matcher.find())
-                {
-                    var word = matcher.group();
-
-                    Integer frequency = dictionaryHash.get(word);
-                    if(frequency != null)
-                    {
-                        //word exists
-                        dictionaryHash.put(word, frequency + 1);
-                    }
-                    else
-                    {
-                        //word doesn't exist
-                        frequency = 1;
-                        dictionaryHash.put(word, frequency);
-                    }
-                    count++;
-                }
-            }
-
-        }
-        catch(IOException e)
-        {
-            System.err.println("File doesn't exist.");
-        }
-
-        System.out.print("Word count: ");
-        System.out.println(count);
-    }
-
-    void fillDictionary()
-    {
-        System.out.println("\nWorking...");
-        try(Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("dictionary.txt"), "utf-8")))
-        {
-            for(var word : dictionaryHash.keySet())
-            {
-                if(word.length() > 4)
-                {
-                    writer.write(word + " " + dictionaryHash.get(word));
-                    ((BufferedWriter) writer).newLine();
-                    writer.flush();
-                }
-            }
-        }
-        catch(IOException e)
-        {
-            System.err.println("FAILED\nError writing to dictionary file. Restart required.");
-        }
-        System.out.println("Task complete.");
     }
 
     /*
@@ -228,13 +124,60 @@ public class Dictionary
 
     }
 
-    public void clearHashBuffer()
-    {
-        dictionaryHash.clear();
-    }
-
     public void spellCheck(File userFile)
     {
+        String line;
+        String dLine;
+        var isCorrect = false;
+        try
+        {
+            BufferedReader reader = new BufferedReader(new FileReader(userFile));
 
+            while((line = reader.readLine()) != null)
+            {
+                String[] words = line.split(" ");
+                for(var word : words)
+                {
+                    BufferedReader readerD = new BufferedReader(new FileReader(dictionaryFile));
+                    while((dLine = readerD.readLine()) != null && !isCorrect)
+                    {
+                        String[] dictionaryWords = dLine.split(" ");
+                        for(var dictionaryWord : dictionaryWords)
+                        {
+                            if(dictionaryWord.equals(word))
+                            {
+                                System.out.println(word + " - Correct");
+                                isCorrect = true;
+                                break;
+                            }
+                        }
+                    }
+                    if(!isCorrect)
+                    {
+                        ArrayList<String> similarWords = new ArrayList<String>();
+                        System.out.println(word + " - Incorrect");
+                        BufferedReader readToFix = new BufferedReader(new FileReader(dictionaryFile));
+                        String ddLine = "";
+                        while ((ddLine = readToFix.readLine()) != null)
+                        {
+                            String[] dictionaryWords = ddLine.split(" ");
+                            for (var dictionaryWord : dictionaryWords)
+                            {
+                                if((similarity(word, dictionaryWord) >= 0.85 || (similarity(word, dictionaryWord)) >= 0.80))
+                                {
+                                    System.out.println(word + " - should be => " + dictionaryWord);
+                                    printSimilarity(word, dictionaryWord);
+                                    similarWords.add(dictionaryWord);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            System.err.println("Error reading file.");
+        }
     }
 }

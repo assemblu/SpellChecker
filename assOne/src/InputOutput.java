@@ -105,8 +105,9 @@ public class InputOutput
         answer.toLowerCase();
         if(answer.equals("y") || answer.equals("yes") || answer.equals("ye"))
         {
+            var db = new DictionaryBuilder();
             System.out.println("Okay!");
-            var dictionary = new Dictionary();
+            var dictionary = new Dictionary(db.getDictionaryFile());
             dictionaryFile.delete();
             System.out.println("Task complete.");
             return true;

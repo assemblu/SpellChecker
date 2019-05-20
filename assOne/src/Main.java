@@ -1,29 +1,29 @@
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 public class Main
 {
     public static void main(String[] args)
     {
         int similarityTest = 0; //set 1 for testing similarity function
         var io = new InputOutput();
-        var dictionary = new Dictionary();
+        var db = new DictionaryBuilder();
+        var cb = new CorpusBuilder();
+        var dictionary = new Dictionary(db.getDictionaryFile());
 
-        io.doesDictionaryExist(dictionary.doesDictionaryExist());
-        io.isDictionaryEmpty(dictionary.isDictionaryEmpty());
-        if(dictionary.isDictionaryEmpty()) //if dictionary is empty ask for corpus file
+
+        io.doesDictionaryExist(db.doesDictionaryExist());
+        io.isDictionaryEmpty(db.isDictionaryEmpty());
+        if(db.isDictionaryEmpty()) //if dictionary is empty ask for corpus file
         {
             io.setCorpus();
-            while(io.isCorpusEmpty(dictionary.isCorpusEmpty(io.getCorpusFile())))
+            while(io.isCorpusEmpty(cb.isCorpusEmpty(io.getCorpusFile())))
             {
                 io.setCorpus();
             }
-            dictionary.setCorpusFile(io.getCorpusFile());
-            dictionary.readCorpus();
-            dictionary.fillDictionary();
+            cb.setCorpusFile(io.getCorpusFile());
+            cb.readCorpus();
+            db.fillDictionary(cb.getDictionaryHash());
         }
 
-        dictionary.clearHashBuffer();
+        cb.clearHashBuffer();
         UserFile uf = new UserFile(io.getUserFile());
         dictionary.spellCheck(uf.getUserFile());
 
