@@ -1,5 +1,11 @@
 import java.io.*;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static java.util.Map.Entry.comparingByValue;
+import static java.util.stream.Collectors.toMap;
 
 public class DictionaryBuilder
 {
@@ -45,16 +51,35 @@ public class DictionaryBuilder
         return false;
     }
 
+    private Map<String, Integer> dictionarySorter(HashMap<String, Integer> dictionaryHash)
+    {
+        //commented for production
+        //System.out.println("Map before sorting: " + dictionaryHash);
+        System.out.println("\nWorking...");
+        Map<String, Integer> sorted = dictionaryHash
+                .entrySet()
+                .stream()
+                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+                .collect(
+                        toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                                LinkedHashMap::new));
+        //commented for production
+        //System.out.println("Map after sorting:" + sorted);
+        return sorted;
+    }
+
+
     public void fillDictionary(HashMap<String, Integer> dictionaryHash)
     {
-        System.out.println("\nWorking...");
+        var sortedMap = dictionarySorter(dictionaryHash);
+
         try(Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("dictionary.txt"), "utf-8")))
         {
-            for(var word : dictionaryHash.keySet())
+            for(var word : sortedMap.keySet())
             {
-                if(word.length() >= 4)
+                if(word.length() >= 3)
                 {
-                    writer.write(word + " " + dictionaryHash.get(word));
+                    writer.write(word + " " + sortedMap.get(word));
                     ((BufferedWriter) writer).newLine();
                     writer.flush();
                 }

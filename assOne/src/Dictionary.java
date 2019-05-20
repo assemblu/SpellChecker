@@ -126,36 +126,40 @@ public class Dictionary
 
     public void spellCheck(File userFile)
     {
-        String line;
-        String dLine;
-        var isCorrect = false;
+
         try
         {
+            String line;
+            String dLine;
+            var isCorrect = false;
+            var isCorrected = false;
             BufferedReader reader = new BufferedReader(new FileReader(userFile));
 
+            //read userfile
             while((line = reader.readLine()) != null)
             {
                 String[] words = line.split(" ");
-                for(var word : words)
+                for(var word : words) //loop user words
                 {
                     BufferedReader readerD = new BufferedReader(new FileReader(dictionaryFile));
+                    //read dictionary
                     while((dLine = readerD.readLine()) != null && !isCorrect)
                     {
                         String[] dictionaryWords = dLine.split(" ");
-                        for(var dictionaryWord : dictionaryWords)
+                        for(var dictionaryWord : dictionaryWords) //loop dictionary words
                         {
-                            if(dictionaryWord.equals(word))
+                            if(dictionaryWord.equals(word) && !isCorrect)
                             {
                                 System.out.println(word + " - Correct");
                                 isCorrect = true;
-                                break;
                             }
                         }
                     }
+
+                    //if still wrong
                     if(!isCorrect)
                     {
-                        ArrayList<String> similarWords = new ArrayList<String>();
-                        System.out.println(word + " - Incorrect");
+                        //System.out.println(word + " - Incorrect");
                         BufferedReader readToFix = new BufferedReader(new FileReader(dictionaryFile));
                         String ddLine = "";
                         while ((ddLine = readToFix.readLine()) != null)
@@ -163,15 +167,40 @@ public class Dictionary
                             String[] dictionaryWords = ddLine.split(" ");
                             for (var dictionaryWord : dictionaryWords)
                             {
-                                if((similarity(word, dictionaryWord) >= 0.85 || (similarity(word, dictionaryWord)) >= 0.80))
+                                if((similarity(word, dictionaryWord) >= 0.70 && (!isCorrect)))
                                 {
                                     System.out.println(word + " - should be => " + dictionaryWord);
-                                    printSimilarity(word, dictionaryWord);
-                                    similarWords.add(dictionaryWord);
+                                    //printSimilarity(word, dictionaryWord);
+                                    isCorrect = true;
+                                }
+                            }
+                        }
+
+
+                        if(!isCorrect)
+                        {
+                            readToFix = new BufferedReader(new FileReader(dictionaryFile));
+                            ddLine = "";
+
+                            while ((ddLine = readToFix.readLine()) != null)
+                            {
+                                String[] dictionaryWords = ddLine.split(" ");
+                                for (var dictionaryWord : dictionaryWords)
+                                {
+                                    if((similarity(word, dictionaryWord) >= 0.60 && (!isCorrect)))
+                                    {
+                                        System.out.println(word + " - should be => " + dictionaryWord);
+                                        //printSimilarity(word, dictionaryWord);
+                                        isCorrect = true;
+                                    }
                                 }
                             }
                         }
                     }
+
+                    //reset
+                    isCorrect = false;
+                    //isCorrected = false;
                 }
             }
         }

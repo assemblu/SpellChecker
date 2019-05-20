@@ -14,7 +14,7 @@ public class CorpusBuilder
 
     public CorpusBuilder()
     {
-        this.dictionaryHash = new HashMap<String, Integer>(1300000);
+        this.dictionaryHash = new HashMap<String, Integer>(130000000);
     }
 
     public HashMap<String, Integer> getDictionaryHash()
