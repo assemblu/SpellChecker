@@ -72,29 +72,35 @@ public class Dictionary
         1,000 is the similarity between "" and ""
         0,100 is the similarity between "1234567890" and "1"
      */
-    public double similarity(String s1, String s2) {
+    public double similarity(String s1, String s2)
+    {
         String longer = s1, shorter = s2;
-        if (s1.length() < s2.length()) { // longer should always have greater length
+        if (s1.length() < s2.length())
+        { // longer should always have greater length
             longer = s2; shorter = s1;
         }
         int longerLength = longer.length();
         if (longerLength == 0) { return 1.0; }
         return (longerLength - editDistance(longer, shorter)) / (double) longerLength;
-
     }
 
-    public int editDistance(String s1, String s2) {
+    public int editDistance(String s1, String s2)
+    {
         s1 = s1.toLowerCase();
         s2 = s2.toLowerCase();
 
         int[] costs = new int[s2.length() + 1];
-        for (int i = 0; i <= s1.length(); i++) {
+        for (int i = 0; i <= s1.length(); i++)
+        {
             int lastValue = i;
-            for (int j = 0; j <= s2.length(); j++) {
+            for (int j = 0; j <= s2.length(); j++)
+            {
                 if (i == 0)
                     costs[j] = j;
-                else {
-                    if (j > 0) {
+                else
+                {
+                    if (j > 0)
+                    {
                         int newValue = costs[j - 1];
                         if (s1.charAt(i - 1) != s2.charAt(j - 1))
                             newValue = Math.min(Math.min(newValue, lastValue),
@@ -126,13 +132,11 @@ public class Dictionary
 
     public void spellCheck(File userFile)
     {
-
         try
         {
             String line;
             String dLine;
             var isCorrect = false;
-            var isCorrected = false;
             BufferedReader reader = new BufferedReader(new FileReader(userFile));
 
             //read userfile
@@ -176,7 +180,7 @@ public class Dictionary
                             }
                         }
 
-
+                        //lower match percentage
                         if(!isCorrect)
                         {
                             readToFix = new BufferedReader(new FileReader(dictionaryFile));
@@ -200,7 +204,6 @@ public class Dictionary
 
                     //reset
                     isCorrect = false;
-                    //isCorrected = false;
                 }
             }
         }
