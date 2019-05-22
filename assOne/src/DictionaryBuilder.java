@@ -7,7 +7,7 @@ import java.util.Map;
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.toMap;
 
-public class DictionaryBuilder
+public class DictionaryBuilder extends LoadingBar
 {
     private File dictionaryFile;
 
@@ -44,10 +44,18 @@ public class DictionaryBuilder
 
     public boolean isDictionaryEmpty()
     {
-        if(dictionaryFile.length() == 0)
+        try
         {
-            return true;
+            if(dictionaryFile.length() == 0)
+            {
+                return true;
+            }
         }
+        catch(Exception e)
+        {
+            System.err.println(e);
+        }
+
         return false;
     }
 
@@ -55,7 +63,6 @@ public class DictionaryBuilder
     {
         //commented for production
         //System.out.println("Map before sorting: " + dictionaryHash);
-        System.out.println("\nWorking...");
         Map<String, Integer> sorted = dictionaryHash
                 .entrySet()
                 .stream()
@@ -68,9 +75,9 @@ public class DictionaryBuilder
         return sorted;
     }
 
-
     public void fillDictionary(HashMap<String, Integer> dictionaryHash)
     {
+        var count = 0;
         var sortedMap = dictionarySorter(dictionaryHash);
 
         try(Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("dictionary.txt"), "utf-8")))
@@ -83,12 +90,15 @@ public class DictionaryBuilder
                     ((BufferedWriter) writer).newLine();
                     writer.flush();
                 }
+                super.loadingBar(count);
+                count++;
             }
+            writer.close();
         }
         catch(IOException e)
         {
             System.err.println("FAILED\nError writing to dictionary file. Restart required.");
         }
-        System.out.println("Task complete.");
+        System.out.println(" - Task complete.");
     }
 }

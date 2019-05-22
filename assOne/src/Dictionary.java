@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-public class Dictionary
+public class Dictionary extends LoadingBar
 {
     private File dictionaryFile;
     private File corpusFile;
@@ -55,15 +55,23 @@ public class Dictionary
     //could use .matches("[a-zA-Z]*") instead but this is faster
     public boolean isAlpha(String name)
     {
-        char[] chars = name.toCharArray();
-
-        for(char c : chars)
+        try
         {
-            if(!Character.isLetter(c))
+            char[] chars = name.toCharArray();
+
+            for (char c : chars)
             {
-                return false;
+                if (!Character.isLetter(c))
+                {
+                    return false;
+                }
             }
         }
+        catch(Exception e)
+        {
+            System.err.println(e);
+        }
+
         return true;
     }
 
@@ -130,8 +138,12 @@ public class Dictionary
 
     }
 
-    public void spellCheck(File userFile)
+    public ArrayList<String> spellCheck(File userFile)
     {
+        var debug = false;
+        var count = 0;
+        var anim = "|/-\\";
+        var correctedFile = new ArrayList<String>();
         try
         {
             String line;
@@ -145,6 +157,8 @@ public class Dictionary
                 String[] words = line.split(" ");
                 for(var word : words) //loop user words
                 {
+                    super.loadingBar(count);
+
                     BufferedReader readerD = new BufferedReader(new FileReader(dictionaryFile));
                     //read dictionary
                     while((dLine = readerD.readLine()) != null && !isCorrect)
@@ -154,13 +168,14 @@ public class Dictionary
                         {
                             if(dictionaryWord.equals(word) && !isCorrect)
                             {
-                                System.out.println(word + " - Correct");
+                                if(debug) System.out.println(word + " - Correct");
                                 isCorrect = true;
+                                correctedFile.add(word);
                             }
                         }
                     }
 
-                    //if still wrong
+                    //if still wrong (for one mistake)
                     if(!isCorrect)
                     {
                         //System.out.println(word + " - Incorrect");
@@ -171,16 +186,16 @@ public class Dictionary
                             String[] dictionaryWords = ddLine.split(" ");
                             for (var dictionaryWord : dictionaryWords)
                             {
-                                if((similarity(word, dictionaryWord) >= 0.70 && (!isCorrect)))
+                                if((similarity(word, dictionaryWord) >= 0.80 && (!isCorrect)))
                                 {
-                                    System.out.println(word + " - should be => " + dictionaryWord);
-                                    //printSimilarity(word, dictionaryWord);
+                                    if(debug) System.out.println(word + " - should be => " + dictionaryWord);
+                                    correctedFile.add(dictionaryWord);
                                     isCorrect = true;
                                 }
                             }
                         }
 
-                        //lower match percentage
+                        //lower match percentage (for 2 or more mistakes)
                         if(!isCorrect)
                         {
                             readToFix = new BufferedReader(new FileReader(dictionaryFile));
@@ -193,8 +208,8 @@ public class Dictionary
                                 {
                                     if((similarity(word, dictionaryWord) >= 0.60 && (!isCorrect)))
                                     {
-                                        System.out.println(word + " - should be => " + dictionaryWord);
-                                        //printSimilarity(word, dictionaryWord);
+                                        if(debug) System.out.println(word + " - should be => " + dictionaryWord);
+                                        correctedFile.add(dictionaryWord);
                                         isCorrect = true;
                                     }
                                 }
@@ -204,6 +219,7 @@ public class Dictionary
 
                     //reset
                     isCorrect = false;
+                    count++;
                 }
             }
         }
@@ -211,5 +227,7 @@ public class Dictionary
         {
             System.err.println("Error reading file.");
         }
+
+        return correctedFile;
     }
 }

@@ -6,9 +6,8 @@ public class UserFile
     private File userFile;
     private ArrayList<String> wordList;
 
-    UserFile(String file)
+    UserFile()
     {
-        this.userFile = new File(file);
         this.wordList = new ArrayList<String>();
     }
 
@@ -17,5 +16,15 @@ public class UserFile
         return this.userFile;
     }
 
-
+    public void setUserFile(String fileName)
+    {
+        try
+        {
+            this.userFile = new File(fileName);
+        }
+        catch(Exception e)
+        {
+            System.err.println(e);
+        }
+    }
 }

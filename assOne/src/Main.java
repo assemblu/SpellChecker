@@ -1,3 +1,5 @@
+import java.nio.charset.CoderResult;
+
 public class Main
 {
     public static void main(String[] args)
@@ -23,7 +25,12 @@ public class Main
         }
 
         cb.clearHashBuffer();
-        UserFile uf = new UserFile(io.getUserFile());
-        dictionary.spellCheck(uf.getUserFile());
+        UserFile uf = new UserFile();
+        uf.setUserFile(io.getUserFile());
+
+        CorrectedFile correctedFile = new CorrectedFile(dictionary.spellCheck(uf.getUserFile()));
+
+        correctedFile.makeFile();
+
     }
 }

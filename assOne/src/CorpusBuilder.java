@@ -7,14 +7,14 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-public class CorpusBuilder
+public class CorpusBuilder extends LoadingBar
 {
     private File corpusFile;
     private HashMap<String, Integer> dictionaryHash;
 
     public CorpusBuilder()
     {
-        this.dictionaryHash = new HashMap<String, Integer>(130000000);
+        this.dictionaryHash = new HashMap<String, Integer>(90000000);
     }
 
     public HashMap<String, Integer> getDictionaryHash()
@@ -52,20 +52,29 @@ public class CorpusBuilder
 
     public void setCorpusFile(String corpusFile)
     {
-        this.corpusFile = new File(corpusFile);
+        try
+        {
+            this.corpusFile = new File(corpusFile);
+        }
+        catch(Exception e)
+        {
+            System.err.println(e);
+        }
     }
 
     public void readCorpus()
     {
         int count = 0;
-        try
+        try(BufferedReader read = new BufferedReader(new FileReader(corpusFile)))
         {
-            var patter = Pattern.compile("[A-Za-z]+");
+            var patter = Pattern.compile("[A-Za-z\']+");
 
-            BufferedReader read = new BufferedReader(new FileReader(corpusFile));
+            //BufferedReader read = new BufferedReader(new FileReader(corpusFile));
             String line;
             while((line = read.readLine()) != null)
             {
+                super.loadingBar(count);
+
                 var matcher = patter.matcher(line);
                 while(matcher.find())
                 {
@@ -87,14 +96,13 @@ public class CorpusBuilder
                 }
             }
 
+            read.close();
         }
         catch(IOException e)
         {
             System.err.println("File doesn't exist.");
         }
 
-        System.out.print("Word count: ");
-        System.out.println(count);
     }
 
     public void clearHashBuffer()

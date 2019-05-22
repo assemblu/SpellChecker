@@ -59,28 +59,41 @@ public class InputOutput
 
     void setCorpus()
     {
-        System.out.println("\nPlease enter a corpus file name. Example: \"corpus.txt\"");
-        System.out.print("Corpus file name: ");
-        String temp = reader.nextLine();
+        try
+        {
+            System.out.println("\nPlease enter a corpus file name. Example: \"corpus.txt\"");
+            System.out.print("Corpus file name: ");
+            String temp = reader.nextLine();
 
-        if(!checkFileInput(temp))
-        {
-            System.out.println("Wrong input.");
-            setCorpus();
+            if (!checkFileInput(temp))
+            {
+                System.out.println("Wrong input.");
+                setCorpus();
+            } else
+            {
+                setCorpusFile(temp);
+            }
         }
-        else
+        catch(Exception e)
         {
-            setCorpusFile(temp);
+            System.err.println(e);
         }
     }
 
     boolean checkFileInput(String input)
     {
-        if(!input.contains(".txt")) return false;
-
-        if(!input.substring(input.length()-4).equals(".txt"))
+        try
         {
-            return false;
+            if (!input.contains(".txt")) return false;
+
+            if (!input.substring(input.length() - 4).equals(".txt"))
+            {
+                return false;
+            }
+        }
+        catch(Exception e)
+        {
+            System.err.println(e);
         }
 
         return true;
@@ -98,42 +111,54 @@ public class InputOutput
 
     boolean askToWipe()
     {
-        System.out.print("Would you like to wipe the data on the dictionary file and start over? [y]: ");
-        Scanner reader = new Scanner(System.in);
-
-        var answer = reader.nextLine();
-        answer.toLowerCase();
-        if(answer.equals("y") || answer.equals("yes") || answer.equals("ye"))
+        try
         {
-            var db = new DictionaryBuilder();
-            System.out.println("Okay!");
-            var dictionary = new Dictionary(db.getDictionaryFile());
-            dictionaryFile.delete();
-            System.out.println("Task complete.");
-            return true;
-        }
+            System.out.print("Would you like to wipe the data on the dictionary file and start over? [y]: ");
 
-        System.out.println("Okay.");
+            var answer = reader.nextLine();
+            answer.toLowerCase();
+            if (answer.equals("y") || answer.equals("yes") || answer.equals("ye"))
+            {
+                var db = new DictionaryBuilder();
+                System.out.println("Okay!");
+                var dictionary = new Dictionary(db.getDictionaryFile());
+                dictionaryFile.delete();
+                System.out.println("Task complete.");
+                return true;
+            }
+
+            System.out.println("Okay.");
+        }
+        catch(Exception e)
+        {
+            System.err.println(e);
+        }
         return false;
 
     }
 
     public String getUserFile()
     {
-        System.out.println("\nPlease enter a corpus file name. Example: \"check.txt\"");
-        System.out.print("File name: ");
-        String temp = reader.nextLine();
-
-        if(!checkFileInput(temp))
+        var temp = "";
+        try
         {
-            System.out.println("Wrong input.");
-            getUserFile();
-        }
-        else
-        {
-            System.out.println("Thank you.");
-        }
+            System.out.println("\nPlease enter a corpus file name. Example: \"check.txt\"");
+            System.out.print("File name: ");
+            temp = reader.nextLine();
 
+            if (!checkFileInput(temp))
+            {
+                System.out.println("Wrong input.");
+                getUserFile();
+            } else
+            {
+                System.out.println("Thank you.");
+            }
+        }
+        catch (Exception e)
+        {
+            System.err.println(e);
+        }
 
         return temp;
     }
