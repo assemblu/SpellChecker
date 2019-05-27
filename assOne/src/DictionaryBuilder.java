@@ -100,7 +100,7 @@ public class DictionaryBuilder extends LoadingBar
         return sortedMap;
     }
 
-    public void readDictionary()
+    public ArrayList<String> readDictionary()
     {
         var count = 0;
         var dictionaryArray = new ArrayList<String>();
@@ -111,15 +111,14 @@ public class DictionaryBuilder extends LoadingBar
             String line;
             while((line = read.readLine()) != null)
             {
-                super.loadingBar();
-
                 var matcher = pattern.matcher(line);
                 while(matcher.find())
                 {
+                    super.loadingBar(count);
                     var word = matcher.group();
 
                     dictionaryArray.add(word);
-
+                    count++;
                 }
             }
 

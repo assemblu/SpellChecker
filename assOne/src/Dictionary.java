@@ -15,10 +15,13 @@ public class Dictionary extends LoadingBar
     private File dictionaryFile;
     private File corpusFile;
     private Map<String, Integer> dictionaryMap;
+    private ArrayList<String> dictionaryArray;
+    private boolean isArray;
 
     public Dictionary(File dictionaryFile)
     {
         this.dictionaryFile = dictionaryFile;
+        this.isArray = false;
     }
 
     public File getDictionaryFile()
@@ -54,27 +57,13 @@ public class Dictionary extends LoadingBar
         this.dictionaryMap = dictionaryMap;
     }
 
-    //could use .matches("[a-zA-Z]*") instead but this is faster
-    public boolean isAlpha(String name)
-    {
-        try
-        {
-            char[] chars = name.toCharArray();
+    public ArrayList<String> getDictionaryArray() {
+        return dictionaryArray;
+    }
 
-            for (char c : chars)
-            {
-                if (!Character.isLetter(c))
-                {
-                    return false;
-                }
-            }
-        }
-        catch(Exception e)
-        {
-            System.err.println(e);
-        }
-
-        return true;
+    public void setDictionaryArray(ArrayList<String> dictionaryArray) {
+        this.isArray = true;
+        this.dictionaryArray = dictionaryArray;
     }
 
     /*
@@ -152,7 +141,6 @@ public class Dictionary extends LoadingBar
             String line;
             while((line =  read.readLine()) != null)
             {
-
                 var matcher = pattern.matcher(line);
                 while(matcher.find())
                 {
@@ -160,21 +148,43 @@ public class Dictionary extends LoadingBar
 
                     var word = matcher.group();
 
-                    if(this.dictionaryMap.containsKey(word))
+                    if(!this.isArray)
                     {
-                        correctedFile.add(word);
-                    }
-                    else
-                    {
-                        for(var dictionaryWord : this.dictionaryMap.entrySet())
+                        if(this.dictionaryMap.containsKey(word))
                         {
-                            if(similarity(word, dictionaryWord.getKey()) >= 0.65)
+                            correctedFile.add(word);
+                        }
+                        else
+                        {
+                            for(var dictionaryWord : this.dictionaryMap.entrySet())
                             {
-                                correctedFile.add(dictionaryWord.getKey());
-                                break;
+                                if(similarity(word, dictionaryWord.getKey()) >= 0.65)
+                                {
+                                    correctedFile.add(dictionaryWord.getKey());
+                                    break;
+                                }
                             }
                         }
                     }
+                    else
+                    {
+                        if(this.dictionaryArray.contains(word))
+                        {
+                            correctedFile.add(word);
+                        }
+                        else
+                        {
+                            for(var dictionaryWord : this.dictionaryArray)
+                            {
+                                if(similarity(word, dictionaryWord) >= 0.65)
+                                {
+                                    correctedFile.add(dictionaryWord);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     count++;
                 }
             }

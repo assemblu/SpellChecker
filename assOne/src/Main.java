@@ -20,14 +20,13 @@ public class Main
                 cb.setCorpusFile(io.getCorpusFile());
             }
             while(!cb.doesExist());
-
             cb.readCorpus();
             dictionary.setDictionaryMap(db.fillDictionary(cb.getDictionaryHash()));
         }
         else
         {
             //read dictionary file to create map
-            db.readDictionary();
+            dictionary.setDictionaryArray(db.readDictionary());
         }
 
         UserFile uf = new UserFile();
@@ -36,6 +35,8 @@ public class Main
             uf.setUserFile(io.askUserFile());
         }
         while(!uf.doesExist());
+
+        uf.setUserFileContent(uf.readUserFile());
 
         CorrectedFile correctedFile = new CorrectedFile(dictionary.spellCheck(uf.getUserFile()));
         correctedFile.makeFile();
