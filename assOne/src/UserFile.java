@@ -18,13 +18,11 @@ public class UserFile
 
     public void setUserFile(String fileName)
     {
-        try
-        {
-            this.userFile = new File(fileName);
-        }
-        catch(Exception e)
-        {
-            System.err.println(e);
-        }
+        this.userFile = new File(fileName);
+    }
+
+    public boolean doesExist()
+    {
+        return this.userFile.exists();
     }
 }

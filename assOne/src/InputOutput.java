@@ -137,19 +137,19 @@ public class InputOutput
 
     }
 
-    public String getUserFile()
+    public String askUserFile()
     {
         var temp = "";
         try
         {
-            System.out.println("\nPlease enter a corpus file name. Example: \"check.txt\"");
-            System.out.print("File name: ");
+            System.out.println("\nPlease enter a user file name. Example: \"check.txt\"");
+            System.out.print("User name: ");
             temp = reader.nextLine();
 
             if (!checkFileInput(temp))
             {
                 System.out.println("Wrong input.");
-                getUserFile();
+                askUserFile();
             } else
             {
                 System.out.println("Thank you.");

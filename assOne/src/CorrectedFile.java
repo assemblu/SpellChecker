@@ -65,6 +65,5 @@ public class CorrectedFile
         {
             System.err.println(e);
         }
-        System.out.println(" - Task complete.");
     }
 }

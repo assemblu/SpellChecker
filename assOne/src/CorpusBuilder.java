@@ -52,14 +52,7 @@ public class CorpusBuilder extends LoadingBar
 
     public void setCorpusFile(String corpusFile)
     {
-        try
-        {
-            this.corpusFile = new File(corpusFile);
-        }
-        catch(Exception e)
-        {
-            System.err.println(e);
-        }
+        this.corpusFile = new File(corpusFile);
     }
 
     public void readCorpus()
@@ -67,7 +60,7 @@ public class CorpusBuilder extends LoadingBar
         int count = 0;
         try(BufferedReader read = new BufferedReader(new FileReader(corpusFile)))
         {
-            var patter = Pattern.compile("[A-Za-z\']+");
+            var patter = Pattern.compile("\\w+");
 
             //BufferedReader read = new BufferedReader(new FileReader(corpusFile));
             String line;
@@ -105,8 +98,8 @@ public class CorpusBuilder extends LoadingBar
 
     }
 
-    public void clearHashBuffer()
+    public boolean doesExist()
     {
-        this.dictionaryHash.clear();
+        return this.corpusFile.exists();
     }
 }

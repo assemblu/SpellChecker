@@ -14,22 +14,30 @@ public class Main
         io.isDictionaryEmpty(db.isDictionaryEmpty());
         if(db.isDictionaryEmpty()) //if dictionary is empty ask for corpus file
         {
-            io.setCorpus();
-            while(io.isCorpusEmpty(cb.isCorpusEmpty(io.getCorpusFile())))
-            {
+
+            do {
                 io.setCorpus();
+                cb.setCorpusFile(io.getCorpusFile());
             }
-            cb.setCorpusFile(io.getCorpusFile());
+            while(!cb.doesExist());
+
             cb.readCorpus();
-            db.fillDictionary(cb.getDictionaryHash());
+            dictionary.setDictionaryMap(db.fillDictionary(cb.getDictionaryHash()));
+        }
+        else
+        {
+            //read dictionary file to create map
+            db.readDictionary();
         }
 
-        cb.clearHashBuffer();
         UserFile uf = new UserFile();
-        uf.setUserFile(io.getUserFile());
+
+        do {
+            uf.setUserFile(io.askUserFile());
+        }
+        while(!uf.doesExist());
 
         CorrectedFile correctedFile = new CorrectedFile(dictionary.spellCheck(uf.getUserFile()));
-
         correctedFile.makeFile();
 
     }

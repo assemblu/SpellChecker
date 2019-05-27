@@ -1,8 +1,6 @@
 import java.io.*;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Pattern;
 
 import static java.util.Map.Entry.comparingByValue;
 import static java.util.stream.Collectors.toMap;
@@ -75,7 +73,7 @@ public class DictionaryBuilder extends LoadingBar
         return sorted;
     }
 
-    public void fillDictionary(HashMap<String, Integer> dictionaryHash)
+    public Map<String, Integer> fillDictionary(HashMap<String, Integer> dictionaryHash)
     {
         var count = 0;
         var sortedMap = dictionarySorter(dictionaryHash);
@@ -99,6 +97,37 @@ public class DictionaryBuilder extends LoadingBar
         {
             System.err.println("FAILED\nError writing to dictionary file. Restart required.");
         }
-        System.out.println(" - Task complete.");
+        return sortedMap;
+    }
+
+    public void readDictionary()
+    {
+        var count = 0;
+        var dictionaryArray = new ArrayList<String>();
+        try(BufferedReader read = new BufferedReader(new FileReader("dictionary.txt")))
+        {
+            var pattern = Pattern.compile("\\w+");
+
+            String line;
+            while((line = read.readLine()) != null)
+            {
+                super.loadingBar();
+
+                var matcher = pattern.matcher(line);
+                while(matcher.find())
+                {
+                    var word = matcher.group();
+
+                    dictionaryArray.add(word);
+
+                }
+            }
+
+        }
+        catch(IOException e)
+        {
+            System.err.println(e);
+        }
+        return dictionaryArray;
     }
 }

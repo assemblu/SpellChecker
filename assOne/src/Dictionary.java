@@ -3,26 +3,22 @@ import java.lang.reflect.Array;
 import java.nio.Buffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Dictionary extends LoadingBar
 {
     private File dictionaryFile;
     private File corpusFile;
-    private HashMap<String, Integer> dictionaryHash;
+    private Map<String, Integer> dictionaryMap;
 
     public Dictionary(File dictionaryFile)
     {
         this.dictionaryFile = dictionaryFile;
-        dictionaryHash = new HashMap<String, Integer>(1300000);
     }
 
     public File getDictionaryFile()
@@ -50,7 +46,13 @@ public class Dictionary extends LoadingBar
         this.corpusFile = new File(corpusFile);
     }
 
+    public Map<String, Integer> getDictionaryMap() {
+        return dictionaryMap;
+    }
 
+    public void setDictionaryMap(Map<String, Integer> dictionaryMap) {
+        this.dictionaryMap = dictionaryMap;
+    }
 
     //could use .matches("[a-zA-Z]*") instead but this is faster
     public boolean isAlpha(String name)
@@ -140,94 +142,47 @@ public class Dictionary extends LoadingBar
 
     public ArrayList<String> spellCheck(File userFile)
     {
-        var debug = false;
-        var count = 0;
-        var anim = "|/-\\";
+        //todo
         var correctedFile = new ArrayList<String>();
-        try
+        var count = 0;
+        try(BufferedReader read = new BufferedReader(new FileReader(userFile)))
         {
-            String line;
-            String dLine;
-            var isCorrect = false;
-            BufferedReader reader = new BufferedReader(new FileReader(userFile));
+            var pattern = Pattern.compile("\\w+");
 
-            //read userfile
-            while((line = reader.readLine()) != null)
+            String line;
+            while((line =  read.readLine()) != null)
             {
-                String[] words = line.split(" ");
-                for(var word : words) //loop user words
+
+                var matcher = pattern.matcher(line);
+                while(matcher.find())
                 {
                     super.loadingBar(count);
 
-                    BufferedReader readerD = new BufferedReader(new FileReader(dictionaryFile));
-                    //read dictionary
-                    while((dLine = readerD.readLine()) != null && !isCorrect)
+                    var word = matcher.group();
+
+                    if(this.dictionaryMap.containsKey(word))
                     {
-                        String[] dictionaryWords = dLine.split(" ");
-                        for(var dictionaryWord : dictionaryWords) //loop dictionary words
+                        correctedFile.add(word);
+                    }
+                    else
+                    {
+                        for(var dictionaryWord : this.dictionaryMap.entrySet())
                         {
-                            if(dictionaryWord.equals(word) && !isCorrect)
+                            if(similarity(word, dictionaryWord.getKey()) >= 0.65)
                             {
-                                if(debug) System.out.println(word + " - Correct");
-                                isCorrect = true;
-                                correctedFile.add(word);
+                                correctedFile.add(dictionaryWord.getKey());
+                                break;
                             }
                         }
                     }
-
-                    //if still wrong (for one mistake)
-                    if(!isCorrect)
-                    {
-                        //System.out.println(word + " - Incorrect");
-                        BufferedReader readToFix = new BufferedReader(new FileReader(dictionaryFile));
-                        String ddLine = "";
-                        while ((ddLine = readToFix.readLine()) != null)
-                        {
-                            String[] dictionaryWords = ddLine.split(" ");
-                            for (var dictionaryWord : dictionaryWords)
-                            {
-                                if((similarity(word, dictionaryWord) >= 0.80 && (!isCorrect)))
-                                {
-                                    if(debug) System.out.println(word + " - should be => " + dictionaryWord);
-                                    correctedFile.add(dictionaryWord);
-                                    isCorrect = true;
-                                }
-                            }
-                        }
-
-                        //lower match percentage (for 2 or more mistakes)
-                        if(!isCorrect)
-                        {
-                            readToFix = new BufferedReader(new FileReader(dictionaryFile));
-                            ddLine = "";
-
-                            while ((ddLine = readToFix.readLine()) != null)
-                            {
-                                String[] dictionaryWords = ddLine.split(" ");
-                                for (var dictionaryWord : dictionaryWords)
-                                {
-                                    if((similarity(word, dictionaryWord) >= 0.60 && (!isCorrect)))
-                                    {
-                                        if(debug) System.out.println(word + " - should be => " + dictionaryWord);
-                                        correctedFile.add(dictionaryWord);
-                                        isCorrect = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    //reset
-                    isCorrect = false;
                     count++;
                 }
             }
         }
-        catch (IOException e)
+        catch(IOException e)
         {
-            System.err.println("Error reading file.");
+            System.err.println(e);
         }
-
         return correctedFile;
     }
 }
