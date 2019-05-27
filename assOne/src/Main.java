@@ -38,7 +38,7 @@ public class Main
 
         uf.setUserFileContent(uf.readUserFile());
 
-        CorrectedFile correctedFile = new CorrectedFile(dictionary.spellCheck(uf.getUserFile()));
+        CorrectedFile correctedFile = new CorrectedFile(dictionary.spellCheck(uf.getUserFileContent()));
         correctedFile.makeFile();
 
     }

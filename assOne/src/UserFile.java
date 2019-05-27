@@ -54,6 +54,7 @@ public class UserFile
         {
             System.err.println(e);
         }
+
         return sb.toString();
     }
 }

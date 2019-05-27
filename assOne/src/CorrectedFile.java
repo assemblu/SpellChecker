@@ -4,12 +4,12 @@ import java.util.ArrayList;
 
 public class CorrectedFile
 {
-    private ArrayList<String> words;
+    private String correctedFileContent;
     private File correctedFile;
 
-    public CorrectedFile(ArrayList<String> words)
+    public CorrectedFile(String correctedFileContent)
     {
-        this.words = words;
+        this.correctedFileContent = correctedFileContent;
         correctedFile = new File("output.txt");
         if(doesFileExist())
         {
@@ -48,18 +48,9 @@ public class CorrectedFile
     {
         var count = 0;
 
-        try(Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(correctedFile), "utf-8")))
+        try (PrintWriter out = new PrintWriter("output.txt"))
         {
-            for(var word : this.words)
-            {
-                writer.write(word + " ");
-                if((count % 50) == 0 && count != 0)
-                {
-                    ((BufferedWriter) writer).newLine();
-                }
-                count++;
-            }
-            writer.close();
+            out.println(this.correctedFileContent);
         }
         catch(IOException e)
         {

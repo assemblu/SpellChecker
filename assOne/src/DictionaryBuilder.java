@@ -82,7 +82,7 @@ public class DictionaryBuilder extends LoadingBar
         {
             for(var word : sortedMap.keySet())
             {
-                if(word.length() >= 3)
+                if(word.length() >= 2)
                 {
                     writer.write(word + " " + sortedMap.get(word));
                     ((BufferedWriter) writer).newLine();

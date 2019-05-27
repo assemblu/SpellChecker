@@ -129,70 +129,72 @@ public class Dictionary extends LoadingBar
 
     }
 
-    public ArrayList<String> spellCheck(File userFile)
+    public String spellCheck(String toCheck)
     {
-        //todo
-        var correctedFile = new ArrayList<String>();
         var count = 0;
-        try(BufferedReader read = new BufferedReader(new FileReader(userFile)))
+        String[] words = toCheck.replaceAll("\\p{P}", "").split(" ");
+        for(var word : words)
         {
-            var pattern = Pattern.compile("\\w+");
+            super.loadingBar(count);
 
-            String line;
-            while((line =  read.readLine()) != null)
+            //if it is an array it means user didn't supply new corpus
+            //so we read the current dictionary which is sorted according to frequency
+            if(!this.isArray)
             {
-                var matcher = pattern.matcher(line);
-                while(matcher.find())
+                if(dictionaryMap.containsKey(word))
                 {
-                    super.loadingBar(count);
-
-                    var word = matcher.group();
-
-                    if(!this.isArray)
+                    //word is correct, do nothing
+                }
+                else
+                {
+                    for(var dictionaryWord : dictionaryMap.entrySet())
                     {
-                        if(this.dictionaryMap.containsKey(word))
+                        if(similarity(word, dictionaryWord.getKey()) >= 0.65)
                         {
-                            correctedFile.add(word);
-                        }
-                        else
-                        {
-                            for(var dictionaryWord : this.dictionaryMap.entrySet())
+                            if(Character.isUpperCase(word.charAt(0)))
                             {
-                                if(similarity(word, dictionaryWord.getKey()) >= 0.65)
-                                {
-                                    correctedFile.add(dictionaryWord.getKey());
-                                    break;
-                                }
+                                String temp = Character.toUpperCase(dictionaryWord.getKey().charAt(0)) + dictionaryWord.getKey().substring(1);
+                                toCheck = toCheck.replace(word, temp);
                             }
+                            else
+                            {
+                                toCheck = toCheck.replace(word, dictionaryWord.getKey());
+                            }
+                            break;
                         }
                     }
-                    else
-                    {
-                        if(this.dictionaryArray.contains(word))
-                        {
-                            correctedFile.add(word);
-                        }
-                        else
-                        {
-                            for(var dictionaryWord : this.dictionaryArray)
-                            {
-                                if(similarity(word, dictionaryWord) >= 0.65)
-                                {
-                                    correctedFile.add(dictionaryWord);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    count++;
                 }
             }
+            else
+            {
+                if(dictionaryArray.contains(word))
+                {
+                    //word is correct, do nothing
+                }
+                else
+                {
+                    for(var dictionaryWord : dictionaryArray)
+                    {
+                        if(similarity(word, dictionaryWord) >= 0.65)
+                        {
+                            if(Character.isUpperCase(word.charAt(0)))
+                            {
+                                String temp = Character.toUpperCase(dictionaryWord.charAt(0)) + dictionaryWord.substring(1);
+                                toCheck = toCheck.replace(word, temp);
+                            }
+                            else
+                            {
+                                toCheck = toCheck.replace(word, dictionaryWord);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            count++;
         }
-        catch(IOException e)
-        {
-            System.err.println(e);
-        }
-        return correctedFile;
+
+
+        return toCheck;
     }
 }
