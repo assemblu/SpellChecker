@@ -25,8 +25,21 @@ public class Main
         }
         else
         {
-            //read dictionary file to create map
-            dictionary.setDictionaryArray(db.readDictionary());
+            if(io.askToWipe())
+            {
+                do {
+                    io.setCorpus();
+                    cb.setCorpusFile(io.getCorpusFile());
+                }
+                while(!cb.doesExist());
+                cb.readCorpus();
+                dictionary.setDictionaryMap(db.fillDictionary(cb.getDictionaryHash()));
+            }
+            else
+            {
+                //read dictionary file to create map
+                dictionary.setDictionaryArray(db.readDictionary());
+            }
         }
 
         UserFile uf = new UserFile();

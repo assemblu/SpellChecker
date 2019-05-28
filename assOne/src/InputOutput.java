@@ -99,7 +99,7 @@ public class InputOutput
         return true;
     }
 
-    boolean isCorpusEmpty(boolean state)
+    public boolean isCorpusEmpty(boolean state)
     {
         if(state)
         {
@@ -109,7 +109,7 @@ public class InputOutput
         return false;
     }
 
-    boolean askToWipe()
+    public boolean askToWipe()
     {
         try
         {
