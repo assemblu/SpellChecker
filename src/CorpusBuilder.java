@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class CorpusBuilder extends LoadingBar
@@ -22,27 +23,47 @@ public class CorpusBuilder extends LoadingBar
         return dictionaryHash;
     }
 
-    public void setDictionaryHash(HashMap<String, Integer> dictionaryHash)
+    public boolean checkFileInput(String input)
     {
-        this.dictionaryHash = dictionaryHash;
-    }
-
-    public boolean isCorpusEmpty(String corpusFile)
-    {
-        try(BufferedReader br = Files.newBufferedReader(Paths.get(corpusFile)))
+        try
         {
-            if(br.readLine() == null)
+            if (!input.contains(".txt")) return false;
+
+            if (!input.substring(input.length() - 4).equals(".txt"))
             {
-                //File empty
-                return true;
+                return false;
             }
         }
-        catch(IOException e)
+        catch(Exception e)
         {
-            System.err.println("Corpus file is empty!");
-            return false;
+            System.err.println(e);
         }
-        return false;
+
+        return true;
+    }
+
+    public void askCorpusFile()
+    {
+        var reader = new Scanner(System.in);
+        try
+        {
+            System.out.println("\nPlease enter a corpus file name. Example: \"corpus.txt\"");
+            System.out.print("Corpus file name: ");
+            String temp = reader.nextLine();
+
+            if (!checkFileInput(temp))
+            {
+                System.out.println("Wrong input.");
+                askCorpusFile();
+            } else
+            {
+                setCorpusFile(temp);
+            }
+        }
+        catch(Exception e)
+        {
+            System.err.println(e);
+        }
     }
 
     public File getCorpusFile()
@@ -89,7 +110,6 @@ public class CorpusBuilder extends LoadingBar
                 }
             }
 
-            read.close();
         }
         catch(IOException e)
         {

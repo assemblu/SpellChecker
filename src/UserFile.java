@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class UserFile
@@ -10,6 +11,7 @@ public class UserFile
     private File userFile;
     private ArrayList<String> wordList;
     private String userFileContent;
+    private File toCheck;
 
     UserFile()
     {
@@ -37,6 +39,20 @@ public class UserFile
     public boolean doesExist()
     {
         return this.userFile.exists();
+    }
+
+    public String askUserFile()
+    {
+        var reader = new Scanner(System.in);
+        var temp = "";
+        do {
+            System.out.println("\nPlease enter a user file name. Example: \"check.txt\"");
+            System.out.print("File name: ");
+            temp = reader.nextLine();
+            this.toCheck = new File(temp);
+        }while(!this.toCheck.exists());
+
+        return temp;
     }
 
     public String readUserFile()
