@@ -9,19 +9,8 @@ import java.util.regex.Pattern;
 public class UserFile
 {
     private File userFile;
-    private ArrayList<String> wordList;
     private String userFileContent;
     private File toCheck;
-
-    UserFile()
-    {
-        this.wordList = new ArrayList<String>();
-    }
-
-    public File getUserFile()
-    {
-        return this.userFile;
-    }
 
     public void setUserFile(String fileName)
     {

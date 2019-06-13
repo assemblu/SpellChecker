@@ -16,6 +16,7 @@ public class Main
         }
         while(!cb.doesExist());
         cb.readCorpus();
+        //here takes a bit long but this gets dictionary, sorts according to frequency and then writes to file.
         dictionary.setDictionaryMap(db.fillDictionary(cb.getDictionaryHash()));
 
         UserFile uf = new UserFile();
