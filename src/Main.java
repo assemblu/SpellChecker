@@ -4,7 +4,7 @@ public class Main
     {
         var db = new DictionaryBuilder();
         var cb = new CorpusBuilder();
-        var dictionary = new Dictionary(db.getDictionaryFile());
+        var dictionary = new SpellChecker(db.getDictionaryFile());
 
 
         db.doesDictionaryExist();

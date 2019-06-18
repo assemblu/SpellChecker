@@ -30,14 +30,14 @@ public class DictionaryBuilder extends LoadingBar
         {
             if(dictionaryFile.createNewFile())
             {
-                System.out.println("Dictionary doesn't exist! Creating new dictionary.");
+                System.out.println("SpellChecker doesn't exist! Creating new dictionary.");
             }
         }
         catch(IOException e)
         {
-            System.out.println("Dictionary exists.");
+            System.out.println("SpellChecker exists.");
         }
-        System.out.println("Dictionary exists.");
+        System.out.println("SpellChecker exists.");
     }
 
     public boolean isDictionaryEmpty()
@@ -46,7 +46,7 @@ public class DictionaryBuilder extends LoadingBar
         {
             if(dictionaryFile.length() == 0)
             {
-                System.out.println("Dictionary file is empty.");
+                System.out.println("SpellChecker file is empty.");
                 return true;
             }
         }
@@ -54,7 +54,7 @@ public class DictionaryBuilder extends LoadingBar
         {
             System.err.println(e);
         }
-        System.out.println("Dictionary file has content.");
+        System.out.println("SpellChecker file has content.");
         return false;
     }
 
@@ -137,7 +137,7 @@ public class DictionaryBuilder extends LoadingBar
         {
             var db = new DictionaryBuilder();
             System.out.println("Wiping previous data!");
-            var dictionary = new Dictionary(db.getDictionaryFile());
+            var dictionary = new SpellChecker(db.getDictionaryFile());
             dictionaryFile.delete();
             System.out.println("Task complete.");
         }

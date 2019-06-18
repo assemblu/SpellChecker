@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 
-public class Dictionary extends LoadingBar
+public class SpellChecker extends LoadingBar
 {
     private File dictionaryFile;
     private Map<String, Integer> dictionaryMap;
 
-    public Dictionary(File dictionaryFile)
+    public SpellChecker(File dictionaryFile)
     {
         this.dictionaryFile = dictionaryFile;
     }
@@ -104,6 +104,7 @@ public class Dictionary extends LoadingBar
         var pattern = Pattern.compile("\\w+");
         var matcher = pattern.matcher(toCheck);
         while(matcher.find()){
+            super.loadingBar(count);
             var word = matcher.group();
             if(dictionaryMap.containsKey(word)){
                 matcher.appendReplacement(sb, word);
@@ -124,6 +125,7 @@ public class Dictionary extends LoadingBar
                 }
 
             }
+            count++;
         }
 
         toCheck = sb.toString();
