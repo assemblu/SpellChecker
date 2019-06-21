@@ -4,7 +4,7 @@ public class Main
     {
         var db = new DictionaryBuilder();
         var cb = new CorpusBuilder();
-        var dictionary = new SpellChecker(db.getDictionaryFile());
+        var spellChecker = new SpellChecker(db.getDictionaryFile());
 
 
         db.doesDictionaryExist();
@@ -17,7 +17,7 @@ public class Main
         while(!cb.doesExist());
         cb.readCorpus();
         //here takes a bit long but this gets dictionary, sorts according to frequency and then writes to file.
-        dictionary.setDictionaryMap(db.fillDictionary(cb.getDictionaryHash()));
+        spellChecker.setDictionaryMap(db.fillDictionary(cb.getDictionaryHash()));
 
         UserFile uf = new UserFile();
 
@@ -28,7 +28,7 @@ public class Main
 
         uf.setUserFileContent(uf.readUserFile());
 
-        CorrectedFile correctedFile = new CorrectedFile(dictionary.spellCheck(uf.getUserFileContent()));
+        CorrectedFile correctedFile = new CorrectedFile(spellChecker.spellCheck(uf.getUserFileContent()));
         correctedFile.makeFile();
 
     }
